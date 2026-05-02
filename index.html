@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekon</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#FFE600;--yd:#D4BF00;--yb:#FFFCE0;--ym:#FFF5A0;
+  --bg:#F7F6F2;--bw:#FFFFFF;--bwarm:#FAF9F5;--bh:#F2F1EC;
+  --br:#E4E2D9;--brs:#C8C5B8;
+  --t:#1A1916;--t2:#4A4840;--t3:#8A8780;--t4:#B5B3AC;
+  --g:#1A7A4A;--gb:#EAF5EE;--gbr:#B8DFC8;
+  --r:#C0392B;--rb:#FDF0EE;--rbr:#F0C4BF;
+  --o:#C25E00;--ob:#FDF3E8;--obr:#F0D4B0;
+  --b:#1A5280;--bb:#EBF3FA;--bbr:#B8D4EC;
+  --f:'Sora',sans-serif;--r6:6px;--r12:12px;--r18:18px;
+  --s1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --s2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--t);min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:'tnum' 1}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:216px;flex-shrink:0;background:var(--bw);border-right:1px solid var(--br);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo-area{padding:20px 18px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:9px}
+.logo-mark{width:32px;height:32px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(255,230,0,.35);flex-shrink:0}
+.logo-type{font-size:15px;font-weight:700;color:var(--t);letter-spacing:-.02em}
+.logo-type em{display:block;font-style:normal;font-size:10px;color:var(--t3);font-weight:400;margin-top:1px}
+.nav-sec{padding:14px 10px 4px}
+.nav-lbl{display:block;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t4);padding:0 8px;margin-bottom:4px}
+.nav-btn{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r6);cursor:pointer;font-size:12.5px;font-weight:400;color:var(--t2);border:none;background:none;width:100%;text-align:left;transition:background .12s,color .12s;font-family:var(--f)}
+.nav-btn:hover{background:var(--bh);color:var(--t)}
+.nav-btn.on{background:var(--yb);color:var(--t);font-weight:600;border:1px solid #E0C900}
+.nc{font-size:9px;font-weight:700;background:var(--r);color:#fff;padding:1px 6px;border-radius:99px}
+.sidebar-foot{margin-top:auto;padding:12px;border-top:1px solid var(--br)}
+.user-row{display:flex;align-items:center;gap:9px;padding:9px 8px;border-radius:var(--r6);background:var(--bwarm);border:1px solid var(--br)}
+.u-av{width:30px;height:30px;border-radius:50%;background:var(--y);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t);flex-shrink:0}
+.u-name{font-size:12px;font-weight:600}.u-plan{font-size:10px;color:var(--t3);margin-top:1px}
+
+/* ── TOPBAR ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--bw);border-bottom:1px solid var(--br);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.tb-title{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.tb-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.sync-pill{display:flex;align-items:center;gap:6px;background:var(--gb);border:1px solid var(--gbr);border-radius:99px;padding:5px 12px;font-size:11px;color:var(--g);font-weight:500}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2.5s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── DEMO BANNER ── */
+.demo-banner{background:#1A1916;color:#F0F0F0;padding:8px 28px;font-size:11px;display:flex;align-items:center;gap:8px}
+.demo-banner strong{color:var(--y);font-weight:600}
+.demo-banner span{color:var(--t3)}
+
+/* ── CONTENT ── */
+.content{padding:24px 28px;overflow-y:auto;flex:1}
+.page{display:none;animation:fu .18s ease}
+.page.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ALERT STRIP ── */
+.strip{background:var(--ob);border:1px solid var(--obr);border-radius:var(--r12);padding:11px 16px;display:flex;align-items:center;gap:12px;margin-bottom:20px;cursor:pointer;transition:box-shadow .12s}
+.strip:hover{box-shadow:var(--s1)}
+.strip-text{flex:1;font-size:12px;color:var(--o);font-weight:500}
+.strip-text span{color:var(--t2);font-weight:400}
+.strip-cta{font-size:10px;font-weight:700;color:var(--o);background:var(--obr);padding:3px 10px;border-radius:99px;white-space:nowrap;letter-spacing:.04em}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--bw);border:1px solid var(--br);border-radius:var(--r12);padding:16px 18px;position:relative;overflow:hidden;box-shadow:var(--s1);transition:box-shadow .15s,transform .15s}
+.kpi:hover{box-shadow:var(--s2);transform:translateY(-1px)}
+.kpi-bar{position:absolute;left:0;top:0;bottom:0;width:3px}
+.kpi-lbl{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.kpi-val{font-size:24px;font-weight:700;color:var(--t);line-height:1;margin-bottom:7px;letter-spacing:-.03em}
+.kpi-sub{font-size:11px;color:var(--t3)}
+.dg{color:var(--g);font-weight:600}.dr{color:var(--r);font-weight:600}.do{color:var(--o);font-weight:600}
+
+/* ── GRID LAYOUTS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.g31{display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:20px}
+
+/* ── CARD ── */
+.card{background:var(--bw);border:1px solid var(--br);border-radius:var(--r12);overflow:hidden;box-shadow:var(--s1)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;background:var(--bwarm)}
+.card-title{font-size:12.5px;font-weight:600;color:var(--t);letter-spacing:-.01em}
+.card-body{padding:14px 16px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.02em;white-space:nowrap}
+.by{background:var(--ym);color:#6A5C00;border:1px solid #CCBA00}
+.bg{background:var(--gb);color:var(--g);border:1px solid var(--gbr)}
+.br2{background:var(--rb);color:var(--r);border:1px solid var(--rbr)}
+.bo{background:var(--ob);color:var(--o);border:1px solid var(--obr)}
+.bb2{background:var(--bb);color:var(--b);border:1px solid var(--bbr)}
+.bn{background:var(--bh);color:var(--t2);border:1px solid var(--br)}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);padding:0 12px 8px;text-align:left;white-space:nowrap}
+.tbl th.r{text-align:right}
+.tbl td{padding:9px 12px;font-size:12.5px;color:var(--t);border-top:1px solid var(--br);vertical-align:middle}
+.tbl td.r{text-align:right}
+.tbl tr:hover td{background:var(--bwarm)}
+.pname{font-size:12.5px;font-weight:500}.pcat{font-size:10px;color:var(--t4);margin-top:2px}
+
+/* ── BARS ── */
+.mb-row{display:flex;align-items:center;gap:7px}
+.mb{width:56px;height:4px;background:var(--br);border-radius:2px;overflow:hidden;flex-shrink:0}
+.mb-fill{height:100%;border-radius:2px}
+.mb-val{font-size:11.5px;font-weight:700;min-width:30px}
+.sb-row{display:flex;align-items:center;gap:6px}
+.sb{width:38px;height:3px;background:var(--br);border-radius:2px;overflow:hidden}
+.sb-fill{height:100%;border-radius:2px}
+.sb-val{font-size:11.5px;font-weight:600;min-width:18px}
+
+/* ── DOT ── */
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dg-d{background:var(--g);box-shadow:0 0 0 2px var(--gb)}
+.do-d{background:var(--o);box-shadow:0 0 0 2px var(--ob)}
+.dr-d{background:var(--r);box-shadow:0 0 0 2px var(--rb)}
+
+/* ── CHART ── */
+.bars{display:flex;align-items:flex-end;gap:4px;height:96px}
+.bc{flex:1;display:flex;align-items:flex-end;cursor:pointer}
+.be{width:100%;background:var(--ym);border:1px solid #E0C900;border-radius:3px 3px 0 0;transition:background .12s;min-height:4px}
+.bc:hover .be,.bc.sel .be{background:var(--y);border-color:var(--yd)}
+.bc.sel .be{box-shadow:0 0 0 2px rgba(255,230,0,.3)}
+.blabels{display:flex;justify-content:space-between;padding:5px 0 0}
+.blbl{font-size:9px;color:var(--t4)}
+
+/* ── DAY DETAIL ── */
+.day-detail{border:1px solid var(--yd);background:var(--yb);border-radius:var(--r12);padding:12px 14px;margin-top:10px;display:none;animation:fu .15s ease}
+.day-detail.on{display:block}
+.day-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.day-title{font-size:12px;font-weight:700}
+.day-acts{display:flex;gap:7px;align-items:center}
+.expand-btn{font-size:11px;font-weight:600;color:var(--t);cursor:pointer;border:1px solid var(--br);background:var(--bw);font-family:var(--f);padding:3px 9px;border-radius:var(--r6);transition:all .12s}
+.expand-btn:hover{border-color:var(--yd);background:var(--yb)}
+.day-close{font-size:11px;color:var(--t3);cursor:pointer;border:none;background:none;font-family:var(--f);padding:3px 7px;border-radius:4px}
+.day-close:hover{background:rgba(0,0,0,.06)}
+.day-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.dm{background:var(--bw);border:1px solid var(--br);border-radius:var(--r6);padding:9px 11px}
+.dm-lbl{font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.dm-val{font-size:16px;font-weight:700;color:var(--t);letter-spacing:-.02em;line-height:1}
+.dm-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.day-breakdown{margin-top:10px;display:none;animation:fu .15s ease}
+.day-breakdown.on{display:block}
+.db-hd{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid rgba(0,0,0,.08)}
+.db-row{display:flex;align-items:center;gap:9px;background:var(--bw);border:1px solid var(--br);border-radius:var(--r6);padding:8px 11px;margin-bottom:5px}
+.db-rank{font-size:10px;font-weight:700;color:var(--t4);width:16px;text-align:center;flex-shrink:0}
+.db-name{font-size:12px;font-weight:500;flex:1}
+.db-star{font-size:9px;font-weight:700;color:#7A6A00;background:var(--ym);padding:1px 5px;border-radius:99px;margin-left:4px}
+.db-u{font-size:11px;color:var(--t3);min-width:50px;text-align:right}
+.db-rev{font-size:12px;font-weight:700;min-width:74px;text-align:right}
+.db-m{font-size:12px;font-weight:700;min-width:38px;text-align:right}
+
+/* ── INNER TABS ── */
+.itabs{display:flex;border-bottom:1px solid var(--br);background:var(--bwarm)}
+.itab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--f);transition:all .12s}
+.itab:hover{color:var(--t)}
+.itab.on{color:var(--t);border-bottom-color:var(--yd);font-weight:600}
+.ipane{display:none}.ipane.on{display:block}
+
+/* ── ALERT ITEMS ── */
+.al-list{display:flex;flex-direction:column;gap:6px}
+.al{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r6);border:1px solid var(--br);border-left:3px solid transparent;background:var(--bwarm);cursor:pointer;transition:box-shadow .12s,transform .1s}
+.al:hover{box-shadow:var(--s1);transform:translateX(2px)}
+.al.crit{border-left-color:var(--r);background:var(--rb);border-color:var(--rbr)}
+.al.warn{border-left-color:var(--o);background:var(--ob);border-color:var(--obr)}
+.al.ok  {border-left-color:var(--g);background:var(--gb);border-color:var(--gbr)}
+.al.info{border-left-color:var(--b);background:var(--bb);border-color:var(--bbr)}
+.al.hidden{display:none}
+.al-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.al-hd{font-size:12px;font-weight:600;margin-bottom:2px}
+.al-body{font-size:11px;color:var(--t2);line-height:1.45}
+.al-time{font-size:10px;color:var(--t4);margin-top:3px}
+
+/* ── ALERT PAGE ITEMS ── */
+.alp{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:var(--r6);border:1px solid var(--br);border-left:3px solid transparent;background:var(--bwarm)}
+.alp.crit{border-left-color:var(--r);background:var(--rb);border-color:var(--rbr)}
+.alp.warn{border-left-color:var(--o);background:var(--ob);border-color:var(--obr)}
+.alp.ok  {border-left-color:var(--g);background:var(--gb);border-color:var(--gbr)}
+.alp.info{border-left-color:var(--b);background:var(--bb);border-color:var(--bbr)}
+.alp.hidden{display:none}
+@keyframes hl-pulse{0%{box-shadow:0 0 0 0 rgba(255,214,0,.8)}50%{box-shadow:0 0 0 6px rgba(255,214,0,.2)}100%{box-shadow:0 0 0 0 rgba(255,214,0,0)}}
+.alp.highlighted{animation:hl-pulse .8s ease;outline:2px solid var(--yd);outline-offset:2px}
+.al-filters{display:flex;gap:5px;margin-bottom:10px}
+.alf{padding:4px 11px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--br);background:var(--bw);color:var(--t3);font-family:var(--f);transition:all .12s}
+.alf.on{background:var(--t);color:#fff;border-color:var(--t)}
+.alf.on.fc{background:var(--r);border-color:var(--r)}
+.alf.on.fw{background:var(--o);border-color:var(--o)}
+.alf.on.fo{background:var(--g);border-color:var(--g)}
+
+/* ── PROD TOOLBAR ── */
+.prod-tb{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--br);background:var(--bwarm)}
+.search-wrap{display:flex;align-items:center;gap:6px;flex:1;max-width:260px;background:var(--bw);border:1px solid var(--br);border-radius:var(--r6);padding:6px 11px;transition:border-color .12s}
+.search-wrap:focus-within{border-color:var(--yd)}
+.search-icon{font-size:12px;opacity:.45;flex-shrink:0}
+.search-inp{border:none;background:none;font-size:12px;color:var(--t);font-family:var(--f);outline:none;width:100%}
+.search-inp::placeholder{color:var(--t4)}
+.prod-count{font-size:11px;color:var(--t3);margin-left:auto}
+.pag-wrap{display:flex;align-items:center;gap:5px}
+.pag-btn{width:28px;height:28px;border-radius:var(--r6);border:1px solid var(--br);background:var(--bw);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t2);transition:all .12s;font-family:var(--f)}
+.pag-btn:hover:not(:disabled){border-color:var(--yd);background:var(--yb)}
+.pag-btn:disabled{opacity:.3;cursor:default}
+.pag-info{font-size:11px;color:var(--t3);min-width:48px;text-align:center}
+.flt-btn{padding:6px 11px;background:var(--bw);border:1px solid var(--br);border-radius:var(--r6);font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;font-family:var(--f);transition:all .12s;white-space:nowrap}
+.flt-btn:hover{border-color:var(--brs);color:var(--t)}
+.flt-btn.on{background:var(--yb);border-color:var(--yd);color:var(--t);font-weight:700}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.st{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.sa{font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:none;padding:3px 7px;border-radius:4px;font-family:var(--f);transition:background .12s}
+.sa:hover{background:var(--bh)}
+
+/* ── REPORT HERO ── */
+.rh{background:var(--y);border-radius:var(--r18);padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden}
+.rh::after{content:'⚡';position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.1;line-height:1}
+.rh-eye{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7A6A00;margin-bottom:5px}
+.rh-week{font-size:18px;font-weight:700;color:var(--t);margin-bottom:16px;letter-spacing:-.02em}
+.rh-metrics{display:grid;grid-template-columns:repeat(3,1fr)}
+.rh-m{padding:0 20px 0 0;border-right:1px solid rgba(0,0,0,.1)}
+.rh-m:first-child{padding-left:0}.rh-m:last-child{border:none}
+.rh-ml{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7A6A00;margin-bottom:3px}
+.rh-mv{font-size:22px;font-weight:700;color:var(--t);line-height:1;letter-spacing:-.02em}
+.rh-ms{font-size:11px;color:#5A4D00;margin-top:2px}
+.r-hls{background:var(--bw);border:1px solid var(--br);border-radius:var(--r12);padding:14px 18px;margin-bottom:18px;display:flex;flex-direction:column;gap:8px}
+.r-hl{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--t2);line-height:1.5}
+.r-hl strong{color:var(--t);font-weight:600}
+
+/* ── HISTORIAL ── */
+.hist-bar-wrap{display:flex;align-items:flex-end;gap:10px;height:120px;margin-bottom:7px}
+.hbc{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.hbe{width:100%;background:var(--ym);border:1px solid #E0C900;border-radius:4px 4px 0 0;transition:background .12s;min-height:4px}
+.hbc:hover .hbe,.hbc.hsel .hbe{background:var(--y);border-color:var(--yd)}
+.hist-m-detail{display:none;margin-top:14px;border-top:1px solid var(--br);padding-top:14px;animation:fu .15s ease}
+
+/* ── ARCHIVED PDF CARDS ── */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.arch-card{background:var(--bw);border:1px solid var(--br);border-radius:var(--r12);padding:13px 15px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--s1)}
+.arch-info h4{font-size:12.5px;font-weight:700;margin-bottom:2px}
+.arch-info p{font-size:11px;color:var(--t3)}
+.arch-info small{font-size:10px;color:var(--t4);margin-top:2px;display:block}
+.arch-btn{padding:5px 11px;background:var(--bwarm);border:1px solid var(--br);border-radius:var(--r6);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--f);color:var(--t2);transition:all .12s;white-space:nowrap}
+.arch-btn:hover{border-color:var(--yd);background:var(--yb)}
+
+/* ── FOCO ── */
+.foco-item{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:rgba(255,255,255,.05);border-radius:var(--r6);border:1px solid rgba(255,255,255,.07);transition:background .12s;cursor:default}
+.foco-item:hover{background:rgba(255,255,255,.08)}
+.foco-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.foco-num.urgent{background:var(--r);color:#fff}
+.foco-num.warn{background:var(--o);color:#fff}
+.foco-num.info{background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+.foco-content{flex:1}
+.foco-action{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px;line-height:1.4}
+.foco-why{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.5}
+.foco-impact{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;flex-shrink:0;align-self:center;margin-top:1px}
+.fi-high{background:rgba(192,57,43,.25);color:#FF8A80}
+.fi-med{background:rgba(194,94,0,.25);color:#FFAB40}
+.fi-low{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+
+.kpi:nth-child(1){animation:su .2s .04s both}
+.kpi:nth-child(2){animation:su .2s .08s both}
+.kpi:nth-child(3){animation:su .2s .12s both}
+.kpi:nth-child(4){animation:su .2s .16s both}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:1fr 1fr}.g2,.g31{grid-template-columns:1fr}.day-metrics{grid-template-columns:1fr 1fr}.arch-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo-area">
+    <div class="logo-mark">⚡</div>
+    <div class="logo-type">Rekon <em>para Mercado Libre</em></div>
+  </div>
+  <div class="nav-sec">
+    <span class="nav-lbl">Principal</span>
+    <button class="nav-btn on" onclick="go('dashboard',this)">Dashboard</button>
+    <button class="nav-btn" onclick="go('productos',this)">Productos</button>
+    <button class="nav-btn" onclick="go('alertas',this)">Alertas <span class="nc">5</span></button>
+  </div>
+  <div class="nav-sec">
+    <span class="nav-lbl">Reportes</span>
+    <button class="nav-btn" onclick="go('reporte',this)">Reporte semanal</button>
+    <button class="nav-btn" onclick="go('historial',this)">Historial</button>
+  </div>
+  <div class="sidebar-foot">
+    <div class="user-row">
+      <div class="u-av">MR</div>
+      <div><div class="u-name">Martín Rodríguez</div><div class="u-plan">Plan Pro · 87 productos</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- DEMO BANNER -->
+  <div class="demo-banner">
+    <span>⚠</span>
+    <span><strong>Modo demo</strong> — Los datos mostrados son ficticios y representativos. <span>Conectá tu cuenta de Mercado Libre para ver tus datos reales.</span></span>
+  </div>
+
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="ptitle">Dashboard</div>
+      <div class="tb-sub" id="psub">Jueves 24 de abril, 2026 · Argentina</div>
+    </div>
+    <div class="sync-pill"><div class="sync-dot"></div>Sincronizado · hace 8 min</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page on" id="page-dashboard">
+      <div class="strip" onclick="goAlerts(null)">
+        <span style="font-size:15px">⚠️</span>
+        <div class="strip-text"><strong>3 alertas urgentes</strong> <span>— 2 productos con stock crítico y 1 caída de precio de la competencia</span></div>
+        <div class="strip-cta">VER ALERTAS →</div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-bar" style="background:var(--y)"></div><div class="kpi-lbl">Ventas del mes</div><div class="kpi-val" id="kpi-v">—</div><div class="kpi-sub"><span class="dg">↑ +32.1%</span> vs. mes anterior</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--g)"></div><div class="kpi-lbl">Ganancia neta est.</div><div class="kpi-val ng" id="kpi-g">—</div><div class="kpi-sub">Margen promedio <span class="dg" id="kpi-m">—</span></div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--o)"></div><div class="kpi-lbl">Productos activos</div><div class="kpi-val">87</div><div class="kpi-sub"><span class="do">2 stock crítico</span> · 5 pausados</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--r)"></div><div class="kpi-lbl">Preguntas sin responder</div><div class="kpi-val nr2">3</div><div class="kpi-sub"><span class="dr">Riesgo de penalización</span></div></div>
+      </div>
+
+      <div class="g31">
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">Ventas diarias — Abril 2026</span>
+            <span class="badge by" id="chart-badge">Cargando...</span>
+          </div>
+          <div class="card-body">
+            <div class="bars" id="chart"></div>
+            <div class="blabels"><span class="blbl">1 abr</span><span class="blbl">8 abr</span><span class="blbl">15 abr</span><span class="blbl">24 abr</span></div>
+            <div class="day-detail" id="day-detail">
+              <div class="day-hd">
+                <div class="day-title" id="day-title">—</div>
+                <div class="day-acts">
+                  <button class="expand-btn" onclick="toggleBreakdown()"><span id="exp-icon">▼</span> Por producto</button>
+                  <button class="day-close" onclick="closeDayDetail()">Cerrar ✕</button>
+                </div>
+              </div>
+              <div class="day-metrics" id="day-metrics"></div>
+              <div class="day-breakdown" id="day-breakdown">
+                <div class="db-hd">Detalle por producto</div>
+                <div id="day-prods"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Alertas activas</span><span class="badge br2">5</span></div>
+          <div class="card-body" style="padding:10px 12px">
+            <div class="al-list">
+              <div class="al crit" onclick="goAlerts('alp-crit-0')"><div class="al-icon">🔴</div><div><div class="al-hd">Stock crítico: Soporte HDMI 4K</div><div class="al-body">2 unidades · 1.4 días estimados</div><div class="al-time">hace 2 h →</div></div></div>
+              <div class="al crit" onclick="goAlerts('alp-crit-1')"><div class="al-icon">🔴</div><div><div class="al-hd">Stock crítico: Cable USB-C 3m</div><div class="al-body">3 unidades · 2.1 días estimados</div><div class="al-time">hace 3 h →</div></div></div>
+              <div class="al warn" onclick="goAlerts('alp-warn-0')"><div class="al-icon">🟠</div><div><div class="al-hd">Competidor bajó precio</div><div class="al-body">Teclado RGB: $14.900 → $12.200</div><div class="al-time">hace 5 h →</div></div></div>
+              <div class="al info" onclick="goAlerts('alp-info-0')"><div class="al-icon">🔵</div><div><div class="al-hd">3 preguntas sin responder</div><div class="al-body">Auricular BT Pro · Mouse Inalámbrico</div><div class="al-time">hace 14 h →</div></div></div>
+              <div class="al ok" onclick="goAlerts('alp-ok-0')"><div class="al-icon">🟢</div><div><div class="al-hd">Reputación: Excelente</div><div class="al-body">95% completadas · 0 reclamos</div><div class="al-time">hoy →</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <span class="card-title">Top 5 productos</span>
+          <button class="sa" onclick="go('productos',document.querySelectorAll('.nav-btn')[1])">Ver catálogo completo →</button>
+        </div>
+        <div class="itabs">
+          <button class="itab on" onclick="it('rent',this)">Por margen</button>
+          <button class="itab" onclick="it('ventas',this)">Por ventas</button>
+          <button class="itab" onclick="it('riesgo',this)">En riesgo</button>
+        </div>
+        <div class="ipane on" id="ip-rent"><table class="tbl"><thead><tr><th style="width:24px;padding-left:14px"></th><th>Producto</th><th>Precio ML</th><th>Costo</th><th>Margen neto</th><th>Estado</th></tr></thead><tbody id="t-rent"></tbody></table></div>
+        <div class="ipane" id="ip-ventas"><table class="tbl"><thead><tr><th style="width:24px;padding-left:14px"></th><th>Producto</th><th>Unidades / mes</th><th>Precio</th><th>Ingresos</th><th>Stock</th></tr></thead><tbody id="t-ventas"></tbody></table></div>
+        <div class="ipane" id="ip-riesgo"><table class="tbl"><thead><tr><th style="width:24px;padding-left:14px"></th><th>Producto</th><th>Problema</th><th>Impacto</th><th>Acción</th></tr></thead><tbody id="t-riesgo"></tbody></table></div>
+      </div>
+
+      <!-- ── FOCO ── -->
+      <div id="foco-card" style="margin-top:14px;background:var(--t);border-radius:var(--r12);overflow:hidden;box-shadow:var(--s2)">
+        <!-- Header -->
+        <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;background:var(--y);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">◎</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.01em">Foco de esta semana</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Actualizado el lunes 21 de abril · basado en tus datos reales</div>
+            </div>
+          </div>
+          <div id="foco-status" style="font-size:10px;font-weight:600;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:5px">
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--g)"></div>
+            Análisis listo
+          </div>
+        </div>
+
+        <!-- Actions list -->
+        <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px" id="foco-items"></div>
+
+        <!-- Footer -->
+        <div style="padding:10px 20px 14px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:10px;color:rgba(255,255,255,.25)">Rekon analiza tus datos cada lunes y genera este resumen automáticamente</div>
+          <button onclick="refreshFoco()" style="font-size:11px;font-weight:600;color:rgba(255,255,255,.5);background:none;border:1px solid rgba(255,255,255,.12);border-radius:var(--r6);padding:4px 10px;cursor:pointer;font-family:var(--f);transition:all .12s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='rgba(255,255,255,.5)'">Actualizar análisis</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PRODUCTOS ══ -->
+    <div class="page" id="page-productos">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">87 productos activos</span><span class="badge bg">Sync cada hora</span></div>
+        <div class="prod-tb">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-inp" placeholder="Buscar producto..." oninput="onSearch(this.value)" id="full-search">
+          </div>
+          <div style="display:flex;gap:5px;margin-left:8px">
+            <button class="flt-btn on" id="f-all" onclick="setFilter('all',this)">Todos</button>
+            <button class="flt-btn" onclick="setFilter('green',this)">🟢</button>
+            <button class="flt-btn" onclick="setFilter('orange',this)">🟡</button>
+            <button class="flt-btn" onclick="setFilter('red',this)">🔴</button>
+            <button class="flt-btn" onclick="setFilter('stock',this)">📦</button>
+          </div>
+          <div class="prod-count" id="full-count"></div>
+          <div class="pag-wrap">
+            <button class="pag-btn" id="prev-btn" onclick="changePage(-1)" disabled>←</button>
+            <div class="pag-info" id="pag-info">—</div>
+            <button class="pag-btn" id="next-btn" onclick="changePage(1)">→</button>
+          </div>
+        </div>
+        <table class="tbl"><thead><tr>
+          <th style="width:24px;padding-left:14px"></th>
+          <th>Producto</th><th>Precio ML</th><th>Costo</th><th>Margen neto</th><th>Ventas / mes</th><th>Stock</th><th class="r">Ganancia est.</th>
+        </tr></thead><tbody id="t-full"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ══ ALERTAS ══ -->
+    <div class="page" id="page-alertas">
+      <div class="g2">
+        <div>
+          <div class="sh"><div class="st">Urgentes</div><span class="badge br2">3</span></div>
+          <div class="al-filters">
+            <button class="alf on" onclick="fAl('urg','all',this)">Todas</button>
+            <button class="alf fc" onclick="fAl('urg','crit',this)">🔴 Críticas</button>
+            <button class="alf fw" onclick="fAl('urg','warn',this)">🟠 Advertencias</button>
+          </div>
+          <div class="al-list" id="al-urg">
+            <div class="alp crit" id="alp-crit-0" data-type="crit"><div class="al-icon">🔴</div><div><div class="al-hd">Stock crítico — Soporte HDMI 4K</div><div class="al-body">Quedan 2 unidades. Ritmo: 1.4 ventas/día. Se agota en ~1.4 días.</div><div class="al-time">hace 2 horas · URGENTE</div></div></div>
+            <div class="alp crit" id="alp-crit-1" data-type="crit"><div class="al-icon">🔴</div><div><div class="al-hd">Stock crítico — Cable USB-C 3m</div><div class="al-body">Quedan 3 unidades. Tiempo estimado: 2.1 días al ritmo actual.</div><div class="al-time">hace 3 horas · URGENTE</div></div></div>
+            <div class="alp warn" id="alp-warn-0" data-type="warn"><div class="al-icon">🟠</div><div><div class="al-hd">Preguntas sin responder — Auricular BT Pro</div><div class="al-body">2 preguntas abiertas hace +18hs. ML puede bajar tu ranking.</div><div class="al-time">hace 18 horas · REVISAR</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sh"><div class="st">Informativas</div><span class="badge bn">3</span></div>
+          <div class="al-filters">
+            <button class="alf on" onclick="fAl('inf','all',this)">Todas</button>
+            <button class="alf fw" onclick="fAl('inf','warn',this)">🟠 Precio</button>
+            <button class="alf fo" onclick="fAl('inf','ok',this)">🟢 Positivas</button>
+          </div>
+          <div class="al-list" id="al-inf">
+            <div class="alp warn" id="alp-warn-1" data-type="warn"><div class="al-icon">🏷️</div><div><div class="al-hd">Competidor bajó precio — Teclado RGB</div><div class="al-body">Techno-Store: $14.900 → $12.200. Quedaste 3ro. Sugerencia: $13.500.</div><div class="al-time">hace 5 horas</div></div></div>
+            <div class="alp info" id="alp-info-0" data-type="info"><div class="al-icon">📈</div><div><div class="al-hd">Pico de visitas — Auricular BT Pro</div><div class="al-body">+340% en visitas en 24hs. Verificá stock para aprovechar.</div><div class="al-time">hace 8 horas</div></div></div>
+            <div class="alp ok" id="alp-ok-0" data-type="ok"><div class="al-icon">⭐</div><div><div class="al-hd">Nueva calificación 5 estrellas</div><div class="al-body">"Excelente vendedor, llegó antes del plazo." — Comprador verificado</div><div class="al-time">hace 2 horas</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REPORTE ══ -->
+    <div class="page" id="page-reporte">
+      <div class="rh">
+        <div class="rh-eye">⚡ Reporte semanal · Rekon</div>
+        <div class="rh-week">Semana 21 – 24 de abril, 2026</div>
+        <div class="rh-metrics">
+          <div class="rh-m"><div class="rh-ml">Ventas totales</div><div class="rh-mv">$274.800</div><div class="rh-ms">↑ +22.1% vs. sem. anterior</div></div>
+          <div class="rh-m" style="padding-left:20px"><div class="rh-ml">Ganancia neta</div><div class="rh-mv">$64.100</div><div class="rh-ms">Margen: 23.3%</div></div>
+          <div class="rh-m" style="padding-left:20px"><div class="rh-ml">Unidades vendidas</div><div class="rh-mv">98</div><div class="rh-ms">4 días activos</div></div>
+        </div>
+      </div>
+      <div class="r-hls">
+        <div class="r-hl">🟢 <strong>Auricular BT Pro</strong> generó $18.900 con margen del 41% — producto más rentable de la semana</div>
+        <div class="r-hl">🔴 <strong>Cable USB-C 2m</strong> sigue con margen del 3.1% — se recomienda pausarlo esta semana</div>
+        <div class="r-hl">⚠️ <strong>Soporte HDMI 4K</strong> con 2 unidades — stock para menos de 1.5 días</div>
+        <div class="r-hl">📈 <strong>Visitas subieron 34%</strong> — mayor tráfico registrado en todo abril</div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Top 5 por ganancia</span></div>
+          <table class="tbl"><thead><tr><th>#</th><th>Producto</th><th>Margen</th><th class="r">Ganancia</th></tr></thead><tbody>
+            <tr><td style="color:var(--t4);font-size:11px;font-weight:600">01</td><td><div class="pname">Auricular BT Pro</div></td><td><span class="badge bg">41%</span></td><td class="r ng" style="font-weight:700">$48.600</td></tr>
+            <tr><td style="color:var(--t4);font-size:11px;font-weight:600">02</td><td><div class="pname">Soporte Monitor Dual</div></td><td><span class="badge bg">36%</span></td><td class="r ng" style="font-weight:700">$32.400</td></tr>
+            <tr><td style="color:var(--t4);font-size:11px;font-weight:600">03</td><td><div class="pname">Mouse Inalámbrico Pro</div></td><td><span class="badge bg">29%</span></td><td class="r ng" style="font-weight:700">$28.100</td></tr>
+            <tr><td style="color:var(--t4);font-size:11px;font-weight:600">04</td><td><div class="pname">Hub USB-C 7 en 1</div></td><td><span class="badge bg">27%</span></td><td class="r ng" style="font-weight:700">$21.600</td></tr>
+            <tr><td style="color:var(--t4);font-size:11px;font-weight:600">05</td><td><div class="pname">Soporte HDMI 4K</div></td><td><span class="badge by">24%</span></td><td class="r ng" style="font-weight:700">$18.400</td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Bottom 5 — a revisar</span></div>
+          <table class="tbl"><thead><tr><th>#</th><th>Producto</th><th>Margen</th><th class="r">Acción</th></tr></thead><tbody>
+            <tr><td style="color:var(--r);font-size:11px;font-weight:700">01</td><td><div class="pname">Cable USB-C 2m</div></td><td><span class="badge br2">3.1%</span></td><td class="r"><span class="badge br2">Pausar</span></td></tr>
+            <tr><td style="color:var(--r);font-size:11px;font-weight:700">02</td><td><div class="pname">Funda Notebook 15"</div></td><td><span class="badge br2">5.8%</span></td><td class="r"><span class="badge bo">Ajustar</span></td></tr>
+            <tr><td style="color:var(--r);font-size:11px;font-weight:700">03</td><td><div class="pname">Cable HDMI 3m</div></td><td><span class="badge bo">8.2%</span></td><td class="r"><span class="badge bo">Ajustar</span></td></tr>
+            <tr><td style="color:var(--r);font-size:11px;font-weight:700">04</td><td><div class="pname">Alargue USB 3m</div></td><td><span class="badge bo">9.4%</span></td><td class="r"><span class="badge by">Revisar</span></td></tr>
+            <tr><td style="color:var(--r);font-size:11px;font-weight:700">05</td><td><div class="pname">Teclado Mecánico RGB</div></td><td><span class="badge bo">11.2%</span></td><td class="r"><span class="badge by">Revisar</span></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HISTORIAL ══ -->
+    <div class="page" id="page-historial">
+      <div class="arch-grid" id="arch-grid"></div>
+
+      <div style="background:var(--bb);border:1px solid var(--bbr);border-radius:var(--r12);padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:18px">
+        <span style="font-size:15px;flex-shrink:0">📊</span>
+        <div style="flex:1;font-size:12px;color:var(--b);line-height:1.5"><strong style="font-weight:700">Período activo: Oct 2025 – Abr 2026.</strong> Al cumplirse en octubre 2026, se genera el PDF automáticamente y se archiva.</div>
+        <button onclick="downloadCurrentPDF()" style="flex-shrink:0;padding:6px 13px;background:var(--b);color:#fff;border:none;border-radius:var(--r6);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--f);white-space:nowrap">⬇ Descargar PDF</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+        <div class="kpi"><div class="kpi-bar" style="background:var(--y)"></div><div class="kpi-lbl">Ventas 6 meses</div><div class="kpi-val">$4.2M</div><div class="kpi-sub"><span class="dg">↑ +31%</span> vs. 6m anteriores</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--g)"></div><div class="kpi-lbl">Ganancia acumulada</div><div class="kpi-val ng">$980K</div><div class="kpi-sub">Margen promedio <span class="dg">23.1%</span></div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--o)"></div><div class="kpi-lbl">Unidades vendidas</div><div class="kpi-val">1.847</div><div class="kpi-sub">Promedio <span class="do">308/mes</span></div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:var(--b)"></div><div class="kpi-lbl">Mejor mes cerrado</div><div class="kpi-val" style="font-size:16px;padding-top:3px">Mar 2026</div><div class="kpi-sub">$621K · margen 23.3%</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-hd"><span class="card-title">Ventas mensuales — Oct 2025 → Abr 2026</span><span class="badge by">Hacé clic en un mes</span></div>
+        <div class="card-body">
+          <div class="hist-bar-wrap" id="hist-bars"></div>
+          <div style="display:flex;gap:10px" id="hist-labels"></div>
+          <div class="hist-m-detail" id="hist-detail">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:700" id="hist-m-title">—</div>
+              <button onclick="closeHistDetail()" style="font-size:11px;color:var(--t3);cursor:pointer;border:none;background:none;font-family:var(--f);padding:2px 7px;border-radius:4px">Cerrar ✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px" id="hist-m-kpis"></div>
+            <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px">Top productos del mes</div>
+            <div id="hist-m-prods"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Resumen mensual</span></div>
+        <table class="tbl"><thead><tr><th>Mes</th><th>Ventas</th><th>Ganancia</th><th>Margen</th><th>Unidades</th><th>Producto estrella</th><th class="r">vs. anterior</th></tr></thead>
+        <tbody id="hist-tbody"></tbody></table>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// DEMO DATA — reemplazar con API real de ML
+// ════════════════════════════════════════════════
+
+const PRODUCTS=[
+  {name:"Auricular BT Pro",    cat:"Audio",       price:18900,cost:9800, sales:48,stock:34,sem:"green"},
+  {name:"Soporte Monitor Dual",cat:"Escritorio",  price:24500,cost:13800,sales:18,stock:12,sem:"green"},
+  {name:"Mouse Inalámbrico Pro",cat:"Periféricos",price:14200,cost:8600, sales:32,stock:28,sem:"green"},
+  {name:"Hub USB-C 7 en 1",   cat:"Conectividad",price:16800,cost:10900,sales:22,stock:19,sem:"green"},
+  {name:"Soporte HDMI 4K",    cat:"Video",       price:8900, cost:5800, sales:41,stock:2, sem:"orange"},
+  {name:"Teclado Mecánico RGB",cat:"Periféricos", price:14900,cost:11400,sales:15,stock:22,sem:"orange"},
+  {name:"Webcam HD 1080p",    cat:"Video",       price:12400,cost:8200, sales:19,stock:15,sem:"green"},
+  {name:"Cable USB-C 3m",     cat:"Cables",      price:4200, cost:2800, sales:67,stock:3, sem:"orange"},
+  {name:"Alargue USB 3m",     cat:"Cables",      price:3800, cost:2900, sales:28,stock:44,sem:"orange"},
+  {name:"Cable USB-C 2m",     cat:"Cables",      price:3500, cost:3100, sales:44,stock:38,sem:"red"},
+  {name:"Funda Notebook 15\"",cat:"Accesorios",  price:6800, cost:5400, sales:23,stock:17,sem:"red"},
+  {name:"Cable HDMI 3m",      cat:"Cables",      price:5200, cost:4200, sales:31,stock:55,sem:"red"},
+];
+
+const DAYS=[
+  {label:"Mié 1 abr", ventas:238400,unidades:28,margen:22.1,prods:[{n:"Auricular BT Pro",u:9,rev:170100,m:41},{n:"Mouse Inalámbrico Pro",u:7,rev:99400,m:29},{n:"Cable USB-C 3m",u:12,rev:50400,m:18}]},
+  {label:"Jue 2 abr", ventas:297500,unidades:35,margen:24.3,prods:[{n:"Hub USB-C 7 en 1",u:11,rev:184800,m:27},{n:"Auricular BT Pro",u:8,rev:151200,m:41},{n:"Soporte HDMI 4K",u:16,rev:142400,m:24}]},
+  {label:"Vie 3 abr", ventas:355800,unidades:42,margen:23.8,prods:[{n:"Auricular BT Pro",u:12,rev:226800,m:41},{n:"Soporte Monitor Dual",u:6,rev:147000,m:36},{n:"Mouse Inalámbrico Pro",u:8,rev:113600,m:29}]},
+  {label:"Sáb 4 abr", ventas:322000,unidades:38,margen:21.9,prods:[{n:"Cable USB-C 3m",u:18,rev:75600,m:18},{n:"Auricular BT Pro",u:10,rev:189000,m:41},{n:"Hub USB-C 7 en 1",u:6,rev:100800,m:27}]},
+  {label:"Dom 5 abr", ventas:475600,unidades:56,margen:25.1,prods:[{n:"Soporte HDMI 4K",u:20,rev:178000,m:24},{n:"Auricular BT Pro",u:14,rev:264600,m:41},{n:"Mouse Inalámbrico Pro",u:9,rev:127800,m:29}]},
+  {label:"Lun 6 abr", ventas:517400,unidades:61,margen:26.4,prods:[{n:"Auricular BT Pro",u:18,rev:340200,m:41},{n:"Soporte Monitor Dual",u:7,rev:171500,m:36},{n:"Hub USB-C 7 en 1",u:9,rev:151200,m:27}]},
+  {label:"Mar 7 abr", ventas:407200,unidades:48,margen:22.7,prods:[{n:"Teclado Mecánico RGB",u:8,rev:119200,m:11},{n:"Auricular BT Pro",u:12,rev:226800,m:41},{n:"Cable USB-C 3m",u:14,rev:58800,m:18}]},
+  {label:"Mié 8 abr", ventas:441600,unidades:52,margen:23.5,prods:[{n:"Mouse Inalámbrico Pro",u:14,rev:198800,m:29},{n:"Auricular BT Pro",u:11,rev:207900,m:41},{n:"Soporte HDMI 4K",u:9,rev:80100,m:24}]},
+  {label:"Jue 9 abr", ventas:373400,unidades:44,margen:24.0,prods:[{n:"Hub USB-C 7 en 1",u:12,rev:201600,m:27},{n:"Auricular BT Pro",u:10,rev:189000,m:41},{n:"Cable HDMI 3m",u:9,rev:46800,m:8}]},
+  {label:"Vie 10 abr",ventas:322000,unidades:38,margen:22.8,prods:[{n:"Auricular BT Pro",u:9,rev:170100,m:41},{n:"Webcam HD 1080p",u:8,rev:99200,m:18},{n:"Cable USB-C 3m",u:11,rev:46200,m:18}]},
+  {label:"Sáb 11 abr",ventas:568800,unidades:67,margen:25.9,prods:[{n:"Auricular BT Pro",u:20,rev:378000,m:41},{n:"Mouse Inalámbrico Pro",u:14,rev:198800,m:29},{n:"Hub USB-C 7 en 1",u:8,rev:134400,m:27}]},
+  {label:"Dom 12 abr",ventas:602600,unidades:71,margen:27.2,prods:[{n:"Auricular BT Pro",u:22,rev:415800,m:41},{n:"Soporte Monitor Dual",u:9,rev:220500,m:36},{n:"Mouse Inalámbrico Pro",u:10,rev:142000,m:29}]},
+  {label:"Lun 13 abr",ventas:492400,unidades:58,margen:24.6,prods:[{n:"Soporte Monitor Dual",u:10,rev:245000,m:36},{n:"Auricular BT Pro",u:14,rev:264600,m:41},{n:"Cable USB-C 3m",u:16,rev:67200,m:18}]},
+  {label:"Mar 14 abr",ventas:534600,unidades:63,margen:25.3,prods:[{n:"Auricular BT Pro",u:16,rev:302400,m:41},{n:"Hub USB-C 7 en 1",u:12,rev:201600,m:27},{n:"Mouse Inalámbrico Pro",u:9,rev:127800,m:29}]},
+  {label:"Mié 15 abr",ventas:636000,unidades:75,margen:26.8,prods:[{n:"Auricular BT Pro",u:22,rev:415800,m:41},{n:"Soporte Monitor Dual",u:10,rev:245000,m:36},{n:"Mouse Inalámbrico Pro",u:12,rev:170400,m:29}]},
+  {label:"Jue 16 abr",ventas:695200,unidades:82,margen:27.5,prods:[{n:"Mouse Inalámbrico Pro",u:18,rev:255600,m:29},{n:"Auricular BT Pro",u:20,rev:378000,m:41},{n:"Soporte Monitor Dual",u:11,rev:269500,m:36}]},
+  {label:"Vie 17 abr",ventas:457800,unidades:54,margen:23.1,prods:[{n:"Hub USB-C 7 en 1",u:14,rev:235200,m:27},{n:"Auricular BT Pro",u:12,rev:226800,m:41},{n:"Cable USB-C 3m",u:16,rev:67200,m:18}]},
+  {label:"Sáb 18 abr",ventas:576800,unidades:68,margen:25.7,prods:[{n:"Auricular BT Pro",u:18,rev:340200,m:41},{n:"Mouse Inalámbrico Pro",u:15,rev:213000,m:29},{n:"Hub USB-C 7 en 1",u:10,rev:168000,m:27}]},
+  {label:"Dom 19 abr",ventas:669600,unidades:79,margen:26.3,prods:[{n:"Auricular BT Pro",u:22,rev:415800,m:41},{n:"Soporte Monitor Dual",u:11,rev:269500,m:36},{n:"Mouse Inalámbrico Pro",u:13,rev:184600,m:29}]},
+  {label:"Lun 20 abr",ventas:712800,unidades:84,margen:27.9,prods:[{n:"Auricular BT Pro",u:24,rev:453600,m:41},{n:"Soporte Monitor Dual",u:12,rev:294000,m:36},{n:"Mouse Inalámbrico Pro",u:14,rev:198800,m:29}]},
+  {label:"Mar 21 abr",ventas:770400,unidades:91,margen:28.1,prods:[{n:"Auricular BT Pro",u:26,rev:491400,m:41},{n:"Soporte Monitor Dual",u:13,rev:318500,m:36},{n:"Mouse Inalámbrico Pro",u:16,rev:227200,m:29}]},
+  {label:"Mié 22 abr",ventas:688200,unidades:81,margen:27.4,prods:[{n:"Auricular BT Pro",u:24,rev:453600,m:41},{n:"Mouse Inalámbrico Pro",u:17,rev:241400,m:29},{n:"Hub USB-C 7 en 1",u:11,rev:184800,m:27}]},
+  {label:"Jue 23 abr",ventas:742600,unidades:88,margen:27.8,prods:[{n:"Auricular BT Pro",u:27,rev:510300,m:41},{n:"Soporte Monitor Dual",u:14,rev:343000,m:36},{n:"Mouse Inalámbrico Pro",u:15,rev:213000,m:29}]},
+  {label:"Jue 24 abr",ventas:811400,unidades:96,margen:28.3,prods:[{n:"Auricular BT Pro",u:29,rev:548100,m:41},{n:"Soporte Monitor Dual",u:15,rev:367500,m:36},{n:"Mouse Inalámbrico Pro",u:18,rev:255600,m:29}]},
+];
+
+const MONTHS=[
+  {label:"Oct 2025",short:"Oct",ventas:512400,ganancia:118100,margen:23.0,unidades:289,estrella:"Auricular BT Pro",vs:null,prods:[{n:"Auricular BT Pro",u:48,rev:907200,m:41},{n:"Mouse Inalámbrico Pro",u:38,rev:539600,m:29},{n:"Hub USB-C 7 en 1",u:29,rev:487200,m:27}]},
+  {label:"Nov 2025",short:"Nov",ventas:634800,ganancia:151400,margen:23.9,unidades:318,estrella:"Auricular BT Pro",vs:+23.9,prods:[{n:"Auricular BT Pro",u:56,rev:1058400,m:41},{n:"Soporte Monitor Dual",u:18,rev:441000,m:36},{n:"Mouse Inalámbrico Pro",u:42,rev:596400,m:29}]},
+  {label:"Dic 2025",short:"Dic",ventas:789200,ganancia:189200,margen:24.0,unidades:401,estrella:"Auricular BT Pro",vs:+24.3,prods:[{n:"Auricular BT Pro",u:72,rev:1360800,m:41},{n:"Hub USB-C 7 en 1",u:34,rev:571200,m:27},{n:"Soporte Monitor Dual",u:22,rev:539000,m:36}]},
+  {label:"Ene 2026",short:"Ene",ventas:481600,ganancia:107000,margen:22.2,unidades:267,estrella:"Mouse Inalámbrico Pro",vs:-39.0,prods:[{n:"Mouse Inalámbrico Pro",u:52,rev:738400,m:29},{n:"Auricular BT Pro",u:38,rev:718200,m:41},{n:"Cable USB-C 3m",u:89,rev:373800,m:18}]},
+  {label:"Feb 2026",short:"Feb",ventas:558900,ganancia:131100,margen:23.5,unidades:283,estrella:"Auricular BT Pro",vs:+16.1,prods:[{n:"Auricular BT Pro",u:51,rev:963900,m:41},{n:"Soporte Monitor Dual",u:21,rev:514500,m:36},{n:"Mouse Inalámbrico Pro",u:39,rev:553800,m:29}]},
+  {label:"Mar 2026",short:"Mar",ventas:621400,ganancia:144600,margen:23.3,unidades:302,estrella:"Auricular BT Pro",vs:+11.2,prods:[{n:"Auricular BT Pro",u:58,rev:1096200,m:41},{n:"Hub USB-C 7 en 1",u:31,rev:520800,m:27},{n:"Soporte Monitor Dual",u:24,rev:588000,m:36}]},
+  {label:"Abr 2026",short:"Abr ·",ventas:null,ganancia:null,margen:null,unidades:null,estrella:"En curso",vs:null,enCurso:true,prods:[]},
+];
+
+const ARCHIVED=[
+  {key:"abr-sep-2024", titulo:"Abr – Sep 2024",ventas:"$1.824.600",ganancia:"$401.400",margen:"22.0%",unidades:"1.124",archivado:"Oct 2024",
+   meses:[{m:"Abr 2024",v:"$241.200",g:"$51.900",mg:"21.5%",u:142,e:"Cable USB-C 3m"},{m:"May 2024",v:"$278.400",g:"$60.200",mg:"21.6%",u:168,e:"Mouse Inalámbrico Pro"},{m:"Jun 2024",v:"$298.800",g:"$65.700",mg:"22.0%",u:181,e:"Auricular BT Pro"},{m:"Jul 2024",v:"$312.600",g:"$70.800",mg:"22.7%",u:189,e:"Auricular BT Pro"},{m:"Ago 2024",v:"$334.200",g:"$74.900",mg:"22.4%",u:198,e:"Auricular BT Pro"},{m:"Sep 2024",v:"$359.400",g:"$77.900",mg:"21.7%",u:246,e:"Auricular BT Pro"}],
+   top:[{r:"01",n:"Auricular BT Pro",u:312,mg:"41%",g:"$291.600"},{r:"02",n:"Mouse Inalámbrico Pro",u:198,mg:"29%",g:"$153.200"},{r:"03",n:"Cable USB-C 3m",u:287,mg:"18%",g:"$89.400"}],
+   nota:"Período de establecimiento. Crecimiento del 48% vs. período anterior. Se incorporó Auricular BT Pro en junio."},
+  {key:"oct-2024-mar-2025", titulo:"Oct 2024 – Mar 2025",ventas:"$2.412.800",ganancia:"$546.200",margen:"22.6%",unidades:"1.389",archivado:"Abr 2025",
+   meses:[{m:"Oct 2024",v:"$364.800",g:"$81.400",mg:"22.3%",u:214,e:"Auricular BT Pro"},{m:"Nov 2024",v:"$418.200",g:"$96.800",mg:"23.1%",u:238,e:"Auricular BT Pro"},{m:"Dic 2024",v:"$512.400",g:"$118.600",mg:"23.1%",u:291,e:"Auricular BT Pro"},{m:"Ene 2025",v:"$344.600",g:"$74.100",mg:"21.5%",u:201,e:"Mouse Inalámbrico Pro"},{m:"Feb 2025",v:"$388.400",g:"$87.200",mg:"22.5%",u:214,e:"Auricular BT Pro"},{m:"Mar 2025",v:"$384.400",g:"$88.100",mg:"22.9%",u:231,e:"Auricular BT Pro"}],
+   top:[{r:"01",n:"Auricular BT Pro",u:401,mg:"41%",g:"$374.400"},{r:"02",n:"Mouse Inalámbrico Pro",u:247,mg:"29%",g:"$191.000"},{r:"03",n:"Soporte Monitor Dual",u:118,mg:"36%",g:"$184.700"}],
+   nota:"Dic 2024 fue el primer mes sobre $500K. Se pausó Cable USB-C 1m por margen negativo."},
+  {key:"abr-sep-2025", titulo:"Abr – Sep 2025",ventas:"$3.144.800",ganancia:"$713.200",margen:"22.7%",unidades:"1.614",archivado:"Oct 2025",
+   meses:[{m:"Abr 2025",v:"$438.600",g:"$98.800",mg:"22.5%",u:248,e:"Auricular BT Pro"},{m:"May 2025",v:"$487.400",g:"$111.200",mg:"22.8%",u:271,e:"Auricular BT Pro"},{m:"Jun 2025",v:"$512.800",g:"$118.400",mg:"23.1%",u:284,e:"Auricular BT Pro"},{m:"Jul 2025",v:"$548.200",g:"$124.600",mg:"22.7%",u:298,e:"Auricular BT Pro"},{m:"Ago 2025",v:"$574.600",g:"$131.800",mg:"22.9%",u:271,e:"Auricular BT Pro"},{m:"Sep 2025",v:"$583.200",g:"$128.400",mg:"22.0%",u:242,e:"Mouse Inalámbrico Pro"}],
+   top:[{r:"01",n:"Auricular BT Pro",u:498,mg:"41%",g:"$464.700"},{r:"02",n:"Soporte Monitor Dual",u:198,mg:"36%",g:"$310.000"},{r:"03",n:"Mouse Inalámbrico Pro",u:312,mg:"29%",g:"$241.200"}],
+   nota:"Mejor período hasta esa fecha. Hub USB-C 7 en 1 relanzado con nuevo proveedor, margen 14% → 27%."},
+];
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+const Q=id=>document.getElementById(id);
+const $$=s=>document.querySelectorAll(s);
+const ps=n=>'$'+n.toLocaleString('es-AR');
+const fmtK=n=>n>=1000000?'$'+(n/1000000).toFixed(2)+'M':'$'+Math.round(n/1000)+'K';
+
+function margin(p){return Math.round(((p.price-p.price*.13-850-p.cost)/p.price)*100)}
+function gain(p){return Math.round((p.price-p.price*.13-850-p.cost)*p.sales)}
+function mColor(m){return m>=20?'var(--g)':m>=10?'var(--o)':'var(--r)'}
+function mBadge(m){return m>=20?'bg':m>=10?'bo':'br2'}
+function dotClass(s){return s==='green'?'dg-d':s==='orange'?'do-d':'dr-d'}
+function stockColor(s){return s<=5?'var(--r)':s<=15?'var(--o)':'var(--g)'}
+
+// Computed totals from DAYS
+const totalVentas=DAYS.reduce((s,d)=>s+d.ventas,0);
+const totalUnidades=DAYS.reduce((s,d)=>s+d.unidades,0);
+const avgMargen=(DAYS.reduce((s,d)=>s+d.margen,0)/DAYS.length).toFixed(1);
+const totalGanancia=Math.round(totalVentas*parseFloat(avgMargen)/100);
+
+// ════════════════════════════════════════════════
+// CHART
+// ════════════════════════════════════════════════
+let selDay=null, breakdownOpen=false;
+
+function buildChart(){
+  const mx=Math.max(...DAYS.map(d=>d.ventas));
+  Q('chart').innerHTML=DAYS.map((d,i)=>`
+    <div class="bc${selDay===i?' sel':''}" id="bc-${i}" onclick="selectDay(${i})">
+      <div class="be" style="height:${Math.round((d.ventas/mx)*90)}px" title="${d.label}"></div>
+    </div>`).join('');
+}
+
+function selectDay(i){
+  if(selDay===i){closeDayDetail();return}
+  selDay=i; breakdownOpen=false;
+  $$('.bc').forEach((b,j)=>b.classList.toggle('sel',j===i));
+  const d=DAYS[i];
+  Q('day-title').textContent=d.label;
+  Q('day-metrics').innerHTML=`
+    <div class="dm"><div class="dm-lbl">Ventas del día</div><div class="dm-val">${ps(d.ventas)}</div><div class="dm-sub">Total facturado</div></div>
+    <div class="dm"><div class="dm-lbl">Unidades</div><div class="dm-val">${d.unidades}</div><div class="dm-sub">Pedidos procesados</div></div>
+    <div class="dm"><div class="dm-lbl">Margen est.</div><div class="dm-val" style="color:var(--g)">${d.margen}%</div><div class="dm-sub">Neto descontando ML</div></div>
+    <div class="dm"><div class="dm-lbl">Producto estrella</div><div class="dm-val" style="font-size:12px;padding-top:3px;line-height:1.3">${d.prods[0].n}</div><div class="dm-sub">${d.prods[0].u} ud. · ${ps(d.prods[0].rev)}</div></div>`;
+  Q('day-prods').innerHTML=d.prods.map((pr,idx)=>`
+    <div class="db-row">
+      <div class="db-rank">${idx+1}</div>
+      <div class="db-name">${pr.n}${idx===0?'<span class="db-star">⭐ Estrella</span>':''}</div>
+      <div class="db-u">${pr.u} ud.</div>
+      <div class="db-rev">${ps(pr.rev)}</div>
+      <div class="db-m" style="color:${mColor(pr.m)}">${pr.m}%</div>
+    </div>`).join('');
+  Q('day-breakdown').classList.remove('on');
+  Q('exp-icon').textContent='▼';
+  Q('day-detail').classList.add('on');
+}
+
+function toggleBreakdown(){
+  breakdownOpen=!breakdownOpen;
+  Q('day-breakdown').classList.toggle('on',breakdownOpen);
+  Q('exp-icon').textContent=breakdownOpen?'▲':'▼';
+}
+
+function closeDayDetail(){
+  selDay=null; breakdownOpen=false;
+  $$('.bc').forEach(b=>b.classList.remove('sel'));
+  Q('day-detail').classList.remove('on');
+}
+
+// ════════════════════════════════════════════════
+// DASHBOARD TOP 5
+// ════════════════════════════════════════════════
+let dashTab='rent';
+
+function renderDash(){
+  let data;
+  if(dashTab==='rent') data=[...PRODUCTS].sort((a,b)=>margin(b)-margin(a)).slice(0,5);
+  else if(dashTab==='ventas') data=[...PRODUCTS].sort((a,b)=>b.sales-a.sales).slice(0,5);
+  else data=PRODUCTS.filter(p=>p.sem!=='green'||margin(p)<15).slice(0,5);
+
+  if(dashTab==='rent'){
+    Q('t-rent').innerHTML=data.map(p=>{const m=margin(p);return`<tr>
+      <td style="padding:9px 6px 9px 14px"><div class="dot ${dotClass(p.sem)}"></div></td>
+      <td><div class="pname">${p.name}</div><div class="pcat">${p.cat}</div></td>
+      <td style="font-weight:600">${ps(p.price)}</td><td style="color:var(--t3)">${ps(p.cost)}</td>
+      <td><div class="mb-row"><div class="mb"><div class="mb-fill" style="width:${Math.min(m,100)}%;background:${mColor(m)}"></div></div><span class="mb-val" style="color:${mColor(m)}">${m}%</span></div></td>
+      <td><span class="badge ${mBadge(m)}">${p.sem==='green'?'✓ Ok':p.sem==='orange'?'Revisar':'Pausar'}</span></td>
+    </tr>`}).join('');
+  } else if(dashTab==='ventas'){
+    Q('t-ventas').innerHTML=data.map(p=>{const c=stockColor(p.stock),pct=Math.min(Math.round(p.stock/40*100),100);return`<tr>
+      <td style="padding:9px 6px 9px 14px"><div class="dot ${dotClass(p.sem)}"></div></td>
+      <td><div class="pname">${p.name}</div><div class="pcat">${p.cat}</div></td>
+      <td style="font-weight:700">${p.sales}</td><td style="font-weight:600">${ps(p.price)}</td>
+      <td style="color:var(--g);font-weight:700">${ps(p.price*p.sales)}</td>
+      <td><div class="sb-row"><div class="sb"><div class="sb-fill" style="width:${pct}%;background:${c}"></div></div><span class="sb-val" style="color:${c}">${p.stock}</span></div></td>
+    </tr>`}).join('');
+  } else {
+    const risky=PRODUCTS.filter(p=>p.sem!=='green'||margin(p)<15).slice(0,5);
+    Q('t-riesgo').innerHTML=risky.map(p=>{
+      const m=margin(p);
+      const pr=p.stock<=5?`📦 Stock crítico (${p.stock})`:m<10?`💸 Margen bajo (${m}%)`:`🏷️ Precio bajo presión`;
+      const ac=p.stock<=5?`<span class="badge br2">Reponer HOY</span>`:m<10?`<span class="badge bo">Pausar / ajustar</span>`:`<span class="badge by">Revisar</span>`;
+      return`<tr>
+        <td style="padding:9px 6px 9px 14px"><div class="dot ${dotClass(p.sem)}"></div></td>
+        <td><div class="pname">${p.name}</div><div class="pcat">${p.cat}</div></td>
+        <td style="font-size:12px;color:var(--t2)">${pr}</td>
+        <td style="font-size:12px;color:var(--t3)">${p.stock<=5?'Pérdida de ventas':m<10?'Vendés sin ganar':'Caída de posición'}</td>
+        <td>${ac}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function it(tab,el){
+  $$('.itab').forEach(t=>t.classList.remove('on'));
+  $$('#ip-rent,#ip-ventas,#ip-riesgo').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  Q('ip-'+tab).classList.add('on');
+  dashTab=tab; renderDash();
+}
+
+// ════════════════════════════════════════════════
+// PRODUCTOS PAGE — paginado + filtros
+// ════════════════════════════════════════════════
+const PER_PAGE=15;
+let search='', filter='all', page=0;
+
+function getFiltered(){
+  let d=[...PRODUCTS];
+  if(search) d=d.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
+  if(filter==='green') d=d.filter(p=>p.sem==='green');
+  else if(filter==='orange') d=d.filter(p=>p.sem==='orange');
+  else if(filter==='red') d=d.filter(p=>p.sem==='red');
+  else if(filter==='stock') d=d.filter(p=>p.stock<=10);
+  return d;
+}
+
+function renderFull(){
+  const d=getFiltered(), total=d.length, pages=Math.max(1,Math.ceil(total/PER_PAGE));
+  page=Math.min(page,pages-1);
+  const slice=d.slice(page*PER_PAGE,(page+1)*PER_PAGE);
+  Q('full-count').textContent=`${total} producto${total!==1?'s':''}`;
+  Q('pag-info').textContent=`${page+1} / ${pages}`;
+  Q('prev-btn').disabled=page===0;
+  Q('next-btn').disabled=page>=pages-1;
+  Q('t-full').innerHTML=slice.map(p=>{
+    const m=margin(p),g=gain(p),c=stockColor(p.stock),pct=Math.min(Math.round(p.stock/40*100),100);
+    return`<tr data-sem="${p.sem}" data-stock="${p.stock}">
+      <td style="padding:9px 6px 9px 14px"><div class="dot ${dotClass(p.sem)}"></div></td>
+      <td><div class="pname">${p.name}</div><div class="pcat">${p.cat}</div></td>
+      <td style="font-weight:600">${ps(p.price)}</td><td style="color:var(--t3)">${ps(p.cost)}</td>
+      <td><div class="mb-row"><div class="mb"><div class="mb-fill" style="width:${Math.min(m,100)}%;background:${mColor(m)}"></div></div><span class="mb-val" style="color:${mColor(m)}">${m}%</span></div></td>
+      <td style="font-weight:600">${p.sales} ud.</td>
+      <td><div class="sb-row"><div class="sb"><div class="sb-fill" style="width:${pct}%;background:${c}"></div></div><span class="sb-val" style="color:${c}">${p.stock}</span></div></td>
+      <td class="r" style="color:var(--g);font-weight:700">${ps(g)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function onSearch(v){search=v;page=0;renderFull()}
+function changePage(d){page+=d;renderFull()}
+function setFilter(f,el){
+  filter=f;page=0;
+  $$('.flt-btn').forEach(b=>{b.classList.remove('on')});
+  el.classList.add('on');
+  renderFull();
+}
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+const NAV_META={
+  dashboard:  ['Dashboard','Jueves 24 de abril, 2026 · Argentina'],
+  productos:  ['Productos','Catálogo completo · 87 activos'],
+  alertas:    ['Alertas','5 alertas activas · 3 urgentes'],
+  reporte:    ['Reporte semanal','Semana 21–24 de abril, 2026 · en curso'],
+  historial:  ['Historial','Oct 2025 – Abr 2026 · período activo + 3 archivos'],
+};
+
+function go(page,el){
+  $$('.page').forEach(p=>p.classList.remove('on'));
+  $$('.nav-btn').forEach(n=>n.classList.remove('on'));
+  Q('page-'+page)?.classList.add('on');
+  el?.classList.add('on');
+  if(NAV_META[page]){Q('ptitle').textContent=NAV_META[page][0];Q('psub').textContent=NAV_META[page][1]}
+  if(page==='productos') renderFull();
+}
+
+function goAlerts(targetId){
+  go('alertas',document.querySelectorAll('.nav-btn')[2]);
+  if(!targetId) return;
+  setTimeout(()=>{
+    const el=Q(targetId);
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    $$('.alp').forEach(i=>i.classList.remove('highlighted'));
+    el.classList.add('highlighted');
+    setTimeout(()=>el.classList.remove('highlighted'),2000);
+  },120);
+}
+
+// ════════════════════════════════════════════════
+// ALERT FILTERS
+// ════════════════════════════════════════════════
+function fAl(list,type,el){
+  el.parentElement.querySelectorAll('.alf').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  Q('al-'+list).querySelectorAll('.alp').forEach(item=>{
+    item.classList.toggle('hidden', type!=='all' && !item.classList.contains(type));
+  });
+}
+
+// ════════════════════════════════════════════════
+// HISTORIAL
+// ════════════════════════════════════════════════
+let selHistMonth=null;
+
+function buildHistorial(){
+  // Archived PDF cards
+  Q('arch-grid').innerHTML=ARCHIVED.map(a=>`
+    <div class="arch-card">
+      <div class="arch-info">
+        <h4>${a.titulo}</h4>
+        <p>${a.ventas} · ${a.ganancia} ganancia</p>
+        <small>Archivado: ${a.archivado}</small>
+      </div>
+      <button class="arch-btn" onclick="downloadArchived('${a.key}')">⬇ PDF</button>
+    </div>`).join('');
+
+  // Monthly bars (solo meses cerrados)
+  const closed=MONTHS.filter(m=>!m.enCurso);
+  const mx=Math.max(...closed.map(m=>m.ventas));
+  Q('hist-bars').innerHTML=MONTHS.map((m,i)=>{
+    if(m.enCurso) return`<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="width:100%;background:repeating-linear-gradient(45deg,var(--bh),var(--bh) 4px,var(--bw) 4px,var(--bw) 8px);border:1px dashed var(--br);border-radius:4px 4px 0 0;height:30px;opacity:.5"></div></div>`;
+    const h=Math.round((m.ventas/mx)*112);
+    return`<div class="hbc" id="hbc-${i}" onclick="selectHistMonth(${i})"><div class="hbe" style="height:${h}px"></div></div>`;
+  }).join('');
+  Q('hist-labels').innerHTML=MONTHS.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:${m.enCurso?'var(--o)':'var(--t4)'};">${m.short}${m.enCurso?' (en curso)':''}</div>`).join('');
+
+  // Table
+  Q('hist-tbody').innerHTML=MONTHS.map((m,i)=>{
+    if(m.enCurso) return`<tr style="cursor:default"><td style="font-weight:600;color:var(--o)">${m.label} <span style="font-size:10px;background:var(--ob);color:var(--o);padding:1px 6px;border-radius:99px;font-weight:700">EN CURSO</span></td><td colspan="6" style="color:var(--t3);font-size:12px">Mes en progreso — datos actualizados a hoy</td></tr>`;
+    const vs=m.vs===null?'<span style="color:var(--t4)">—</span>':m.vs>0?`<span class="ng" style="font-weight:700">↑ +${m.vs}%</span>`:`<span class="nr2" style="font-weight:700">↓ ${m.vs}%</span>`;
+    return`<tr style="cursor:pointer" onclick="selectHistMonth(${i})">
+      <td style="font-weight:600">${m.label}</td>
+      <td style="font-weight:700">${ps(m.ventas)}</td>
+      <td class="ng" style="font-weight:700">${ps(m.ganancia)}</td>
+      <td><span class="badge ${m.margen>=24?'bg':m.margen>=22?'by':'bo'}">${m.margen}%</span></td>
+      <td style="font-weight:600">${m.unidades}</td>
+      <td style="font-size:12px">${m.estrella}</td>
+      <td class="r">${vs}</td>
+    </tr>`;
+  }).join('');
+}
+
+function selectHistMonth(i){
+  const m=MONTHS[i];
+  if(m.enCurso) return;
+  if(selHistMonth===i){closeHistDetail();return}
+  selHistMonth=i;
+  $$('.hbc').forEach((b,j)=>{
+    const be=b.querySelector('.hbe');
+    if(be){be.style.background=j===i?'var(--y)':'var(--ym)';be.style.borderColor=j===i?'var(--yd)':'#E0C900';}
+  });
+  Q('hist-m-title').textContent=m.label+' — Detalle del mes';
+  Q('hist-m-kpis').innerHTML=`
+    <div class="dm"><div class="dm-lbl">Ventas</div><div class="dm-val">${ps(m.ventas)}</div></div>
+    <div class="dm"><div class="dm-lbl">Ganancia</div><div class="dm-val" style="color:var(--g)">${ps(m.ganancia)}</div></div>
+    <div class="dm"><div class="dm-lbl">Margen</div><div class="dm-val" style="color:var(--g)">${m.margen}%</div></div>
+    <div class="dm"><div class="dm-lbl">Unidades</div><div class="dm-val">${m.unidades}</div></div>`;
+  Q('hist-m-prods').innerHTML=m.prods.map((pr,idx)=>`
+    <div class="db-row">
+      <div class="db-rank">${idx+1}</div>
+      <div class="db-name">${pr.n}${idx===0?'<span class="db-star">⭐ Estrella</span>':''}</div>
+      <div class="db-u">${pr.u} ud.</div>
+      <div class="db-rev">${ps(pr.rev)}</div>
+      <div class="db-m" style="color:${mColor(pr.m)}">${pr.m}%</div>
+    </div>`).join('');
+  Q('hist-detail').style.display='block';
+}
+
+function closeHistDetail(){
+  selHistMonth=null;
+  $$('.hbc').forEach(b=>{const be=b.querySelector('.hbe');if(be){be.style.background='var(--ym)';be.style.borderColor='#E0C900';}});
+  Q('hist-detail').style.display='none';
+}
+
+// ════════════════════════════════════════════════
+// PDF GENERATORS
+// ════════════════════════════════════════════════
+function pdfStyles(){
+  return`body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1A1916;padding:36px;max-width:800px;margin:0 auto}
+  h1{font-size:20px;font-weight:700;margin-bottom:3px;letter-spacing:-.02em}
+  .sub{font-size:11px;color:#8A8780;margin-bottom:20px}
+  .hero{background:#FFE600;border-radius:10px;padding:18px 22px;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .hl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7A6A00;margin-bottom:3px}
+  .hv{font-size:20px;font-weight:700;letter-spacing:-.02em}
+  h2{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A8780;margin:18px 0 7px;padding-bottom:5px;border-bottom:1px solid #E4E2D9}
+  table{width:100%;border-collapse:collapse;margin-bottom:18px;font-size:11px}
+  th{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B5B3AC;padding:4px 9px 6px;text-align:left;border-bottom:2px solid #E4E2D9}
+  td{padding:8px 9px;border-bottom:1px solid #F2F1EC}
+  .note{background:#FAF9F5;border:1px solid #E4E2D9;border-radius:7px;padding:12px 14px;font-size:11px;color:#4A4840;line-height:1.6;margin-bottom:18px}
+  .badge{display:inline-block;border-radius:99px;font-size:9px;font-weight:700;padding:1px 8px;letter-spacing:.03em}
+  .footer{font-size:9px;color:#B5B3AC;text-align:center;margin-top:24px;padding-top:12px;border-top:1px solid #E4E2D9}
+  @media print{body{padding:18px}}`;
+}
+
+function downloadCurrentPDF(){
+  const rows=MONTHS.filter(m=>!m.enCurso).map(m=>`<tr><td>${m.label}</td><td>${ps(m.ventas)}</td><td>${ps(m.ganancia)}</td><td>${m.margen}%</td><td>${m.unidades}</td><td>${m.estrella}</td></tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rekon — Oct 2025–Abr 2026</title><style>${pdfStyles()}</style></head><body>
+  <h1>⚡ Rekon — Reporte Semestral</h1>
+  <div class="sub">Período activo: Octubre 2025 – Abril 2026 (en curso) · Martín Rodríguez · Plan Pro · getrekon.app</div>
+  <div class="hero">
+    <div><div class="hl">Ventas acumuladas</div><div class="hv">$4.2M</div></div>
+    <div><div class="hl">Ganancia acumulada</div><div class="hv">$980K</div></div>
+    <div><div class="hl">Margen promedio</div><div class="hv">23.1%</div></div>
+    <div><div class="hl">Unidades vendidas</div><div class="hv">1.847</div></div>
+  </div>
+  <h2>Resumen mensual</h2>
+  <table><thead><tr><th>Mes</th><th>Ventas</th><th>Ganancia</th><th>Margen</th><th>Unidades</th><th>Producto estrella</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="footer">Generado por Rekon · getrekon.app · Próximo archivo automático: Octubre 2026</div>
+  <script>setTimeout(()=>window.print(),400)<\/script></body></html>`);
+  w.document.close();
+}
+
+function downloadArchived(key){
+  const d=ARCHIVED.find(a=>a.key===key);
+  if(!d) return;
+  const rows=d.meses.map(m=>`<tr><td>${m.m}</td><td>${m.v}</td><td>${m.g}</td><td>${m.mg}</td><td>${m.u}</td><td>${m.e}</td></tr>`).join('');
+  const topRows=d.top.map(t=>`<tr><td>${t.r}</td><td>${t.n}</td><td>${t.u}</td><td>${t.mg}</td><td>${t.g}</td></tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rekon — ${d.titulo}</title><style>${pdfStyles()}</style></head><body>
+  <h1>⚡ Rekon — ${d.titulo}</h1>
+  <div class="sub">Martín Rodríguez · Plan Pro · getrekon.app</div>
+  <div style="display:inline-block;background:#EBF3FA;color:#1A5280;border:1px solid #B8D4EC;border-radius:99px;font-size:9px;font-weight:700;padding:2px 10px;margin-bottom:14px;letter-spacing:.04em">📦 PERÍODO ARCHIVADO · Generado: ${d.archivado}</div>
+  <div class="hero">
+    <div><div class="hl">Ventas totales</div><div class="hv">${d.ventas}</div></div>
+    <div><div class="hl">Ganancia acumulada</div><div class="hv">${d.ganancia}</div></div>
+    <div><div class="hl">Margen promedio</div><div class="hv">${d.margen}</div></div>
+    <div><div class="hl">Unidades vendidas</div><div class="hv">${d.unidades}</div></div>
+  </div>
+  <h2>Resumen mensual</h2>
+  <table><thead><tr><th>Mes</th><th>Ventas</th><th>Ganancia</th><th>Margen</th><th>Unidades</th><th>Producto estrella</th></tr></thead><tbody>${rows}</tbody></table>
+  <h2>Top productos del período</h2>
+  <table><thead><tr><th>#</th><th>Producto</th><th>Unidades</th><th>Margen prom.</th><th>Ganancia total</th></tr></thead><tbody>${topRows}</tbody></table>
+  <h2>Notas del período</h2>
+  <div class="note">${d.nota}</div>
+  <div class="footer">Período archivado por Rekon al cierre de ${d.titulo}. Los datos fueron eliminados del sistema activo. Este PDF es el registro permanente.</div>
+  <script>setTimeout(()=>window.print(),400)<\/script></body></html>`);
+  w.document.close();
+}
+
+// ════════════════════════════════════════════════
+// FOCO — análisis semanal de acciones prioritarias
+// En producción: generado por Claude API vía n8n
+// cada lunes con los datos reales del seller
+// ════════════════════════════════════════════════
+const FOCO_ITEMS = [
+  {
+    priority: 1,
+    type: 'urgent',
+    action: 'Reponé Soporte HDMI 4K antes del jueves',
+    why: 'Quedan 2 unidades — a tu ritmo actual se agotan en 1.4 días. Si se queda sin stock perdés posición en el buscador de ML y vas a tardar semanas en recuperarla.',
+    impact: 'Alto impacto',
+    impactClass: 'fi-high'
+  },
+  {
+    priority: 2,
+    type: 'urgent',
+    action: 'Pausá Cable USB-C 2m esta semana',
+    why: 'Tiene 3.1% de margen neto. Vendiste 44 unidades este mes y ganaste casi nada. Ese tiempo y capital invertido en Auricular BT Pro (41% margen) te genera 13 veces más.',
+    impact: 'Alto impacto',
+    impactClass: 'fi-high'
+  },
+  {
+    priority: 3,
+    type: 'warn',
+    action: 'Respondé las 3 preguntas abiertas hoy',
+    why: 'Llevan más de 18 horas sin respuesta. ML penaliza la demora bajando tu exposición en el buscador. Son 5 minutos que protegen tu ranking.',
+    impact: 'Impacto medio',
+    impactClass: 'fi-med'
+  },
+  {
+    priority: 4,
+    type: 'warn',
+    action: 'Revisá el precio del Teclado Mecánico RGB',
+    why: 'Un competidor bajó a $12.200 y quedaste 3ro. Ajustar a $13.500 te devuelve el 2do lugar sin sacrificar margen de forma significativa.',
+    impact: 'Impacto medio',
+    impactClass: 'fi-med'
+  },
+  {
+    priority: 5,
+    type: 'info',
+    action: 'Aprovechá el pico de visitas en Auricular BT Pro',
+    why: 'Tuviste +340% de visitas esta semana. Stock actual: 34 unidades. Suficiente por ahora, pero si el ritmo continúa vas a necesitar reponer antes de fin de mes.',
+    impact: 'A monitorear',
+    impactClass: 'fi-low'
+  },
+];
+
+function buildFoco() {
+  Q('foco-items').innerHTML = FOCO_ITEMS.map(item => `
+    <div class="foco-item">
+      <div class="foco-num ${item.type}">${item.priority}</div>
+      <div class="foco-content">
+        <div class="foco-action">${item.action}</div>
+        <div class="foco-why">${item.why}</div>
+      </div>
+      <div class="foco-impact ${item.impactClass}">${item.impact}</div>
+    </div>
+  `).join('');
+}
+
+function refreshFoco() {
+  const btn = Q('foco-card').querySelector('button');
+  const status = Q('foco-status');
+  btn.textContent = 'Analizando...';
+  btn.style.opacity = '.5';
+  status.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:var(--y);animation:blink 1s ease infinite"></div> Procesando datos';
+  // Simula el delay de la API — en producción acá iría el fetch a tu endpoint
+  setTimeout(() => {
+    btn.textContent = 'Actualizar análisis';
+    btn.style.opacity = '1';
+    status.innerHTML = '<div style="width:5px;height:5px;border-radius:50%;background:var(--g)"></div> Análisis listo';
+    buildFoco();
+  }, 1800);
+}
+
+buildChart();
+renderDash();
+renderFull();
+buildHistorial();
+buildFoco();
+
+// Inject computed KPIs
+Q('kpi-v').textContent=fmtK(totalVentas);
+Q('kpi-g').textContent=fmtK(totalGanancia);
+Q('kpi-m').textContent=avgMargen+'%';
+Q('chart-badge').textContent=fmtK(totalVentas)+' · hasta hoy';
+</script>
+</body>
+</html>
