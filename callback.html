@@ -35,11 +35,18 @@ const error = params.get('error');
 
 if (error) {
   window.location.href = '/index.html?error=' + error;
-} else if (code) {
-  // Redirigir a la Edge Function con el código
-  window.location.href = EDGE_FUNCTION + '?code=' + code;
-} else {
+} else if (!code) {
   window.location.href = '/index.html?error=no_code';
+} else {
+  // Llamar a la Edge Function directamente con fetch
+  fetch(EDGE_FUNCTION + '?code=' + encodeURIComponent(code))
+    .then(res => {
+      // La función devuelve un redirect — seguimos la URL final
+      window.location.href = '/rekon.html';
+    })
+    .catch(err => {
+      window.location.href = '/index.html?error=fetch_failed';
+    });
 }
 </script>
 </body>
