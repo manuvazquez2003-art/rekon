@@ -60,7 +60,8 @@ const ML_CLIENT_ID = '8096491455255659';
 const REDIRECT_URI = 'https://rekon-ebon.vercel.app/callback.html';
 
 function conectarML() {
-  const url = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${ML_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+  const REDIRECT = 'https://jftplkcoqxzkkhvuwemj.supabase.co/functions/v1/bright-worker';
+  const url = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${ML_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}`;
   window.location.href = url;
 }
 </script>
